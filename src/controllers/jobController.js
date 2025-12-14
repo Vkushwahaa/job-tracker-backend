@@ -135,7 +135,7 @@ export const getJobs = async (req, res) => {
     // Pagination calc
     const skip = (page - 1) * limit;
 
-    const total = await JobApplication.countDocuments(filter);
+    const total = await JobApplication.countDocuments({ userId: userId });
 
     const jobs = await JobApplication.find(filter)
       .sort(sort)
@@ -148,7 +148,7 @@ export const getJobs = async (req, res) => {
         total,
         page,
         limit,
-        pages: Math.ceil(total / limit),
+        pages: Math.max(1, Math.ceil(total / limit)),
         hasMore: page * limit < total,
       },
       data: jobs,
