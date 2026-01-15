@@ -32,6 +32,7 @@ export async function applyGmailUpdate({ userId, parsedEmail }) {
     messageId,
     threadId,
     subject,
+    note,
     sender,
   } = parsedEmail;
 
@@ -140,6 +141,7 @@ export async function applyGmailUpdate({ userId, parsedEmail }) {
       reasons: ["New job detected from Gmail"],
       needsReview: true,
     },
+    notes: note,
     sourceMeta: {
       messageId,
       threadId,

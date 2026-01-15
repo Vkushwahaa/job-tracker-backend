@@ -184,6 +184,7 @@ export async function syncGmailForUser(userId, { limit = 10 } = {}) {
       jobTitle: parsedEmail.jobTitle,
       inferredStatus: parsedEmail.inferredStatus,
       score: parsedEmail.detection?.score ?? 0,
+      note: parsedEmail.note ?? "",
       action: result.type,
     });
     await EmailAccount.updateOne(

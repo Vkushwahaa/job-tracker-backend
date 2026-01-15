@@ -55,7 +55,7 @@ Return ONLY valid JSON matching this schema:
     "score": number (0-100),
     "reasons": string[]
   },
-  "note": string | null
+  "notes": string | null
 }
 
 Rules:
