@@ -22,7 +22,7 @@ function confidenceLevel(score) {
 export async function applyGmailUpdate({ userId, parsedEmail }) {
   const parserScore = Math.min(
     100,
-    Math.max(0, parsedEmail?.detection?.score || 0)
+    Math.max(0, parsedEmail?.detection?.score || 0),
   );
 
   const {
@@ -93,9 +93,11 @@ export async function applyGmailUpdate({ userId, parsedEmail }) {
     }
   }
 
-  const level = confidenceLevel(bestScore);
+  // Use parser score when no candidate matches (ensures newly created jobs get a meaningful confidence)
+  const effectiveScore = Math.max(bestScore, parserScore);
+  const level = confidenceLevel(effectiveScore);
   const confidence = {
-    score: bestScore,
+    score: effectiveScore,
     level,
     reasons: [
       "Company name matched",
@@ -114,17 +116,17 @@ export async function applyGmailUpdate({ userId, parsedEmail }) {
     bestJob.confidence = confidence;
     bestJob.notes =
       (bestJob.notes || "") +
-      `\n[Gmail ${level} confidence • ${bestScore}%] ${subject}`;
+      `\n[Gmail ${level} confidence • ${effectiveScore}%] ${subject}`;
 
     await bestJob.save();
 
     return {
       type: level === "high" ? "updated" : "soft-updated",
-      confidence: bestScore,
+      confidence: effectiveScore,
     };
   }
   if (!companyName || !jobTitle) {
-    return { type: "ignored", confidence: bestScore };
+    return { type: "ignored", confidence: effectiveScore };
   }
   // 4. CREATE NEW
   await JobApplication.create({
@@ -136,7 +138,7 @@ export async function applyGmailUpdate({ userId, parsedEmail }) {
     autoFetched: true,
     lastActivityAt: now,
     confidence: {
-      score: bestScore,
+      score: effectiveScore,
       level,
       reasons: ["New job detected from Gmail"],
       needsReview: true,
