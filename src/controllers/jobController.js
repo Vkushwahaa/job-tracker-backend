@@ -3,7 +3,7 @@ import User from "../models/user.js";
 
 export const createJob = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     const findUser = await User.findById({ _id: userId });
     if (!findUser) {
       return res.status(404).json({ message: "user not found" });
@@ -46,7 +46,7 @@ export const updateJob = async (req, res) => {
   try {
     const jobId = req.params.id;
     const updatedJob = await JobApplication.findOneAndUpdate(
-      { _id: jobId, userId: req.user.id },
+      { _id: jobId, userId: req.userId },
       req.body,
       { new: true }
     );
@@ -64,7 +64,7 @@ export const deleteJob = async (req, res) => {
     const jobId = req.params.id;
     const deleted = await JobApplication.findOneAndDelete({
       _id: jobId,
-      userId: req.user.id,
+      userId: req.userId,
     });
     if (!deleted) {
       return res.status(404).json({ message: "job not found" });
@@ -79,7 +79,7 @@ export const getSingleJob = async (req, res) => {
   try {
     const job = await JobApplication.findOne({
       _id: req.params.id,
-      userId: req.user.id,
+      userId: req.userId,
     });
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
@@ -91,7 +91,7 @@ export const getSingleJob = async (req, res) => {
 };
 export const getJobs = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.userId;
     let {
       page = 1,
       limit = 20,
@@ -135,7 +135,7 @@ export const getJobs = async (req, res) => {
     // Pagination calc
     const skip = (page - 1) * limit;
 
-    const total = await JobApplication.countDocuments(filter);
+    const total = await JobApplication.countDocuments({ userId: userId });
 
     const jobs = await JobApplication.find(filter)
       .sort(sort)
@@ -148,7 +148,7 @@ export const getJobs = async (req, res) => {
         total,
         page,
         limit,
-        pages: Math.ceil(total / limit),
+        pages: Math.max(1, Math.ceil(total / limit)),
         hasMore: page * limit < total,
       },
       data: jobs,
