@@ -1,31 +1,77 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
+import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/authRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
-import cookieParser from "cookie-parser";
-import "./cron/emailCron.js";
 import emailRoutes from "./routes/emailRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 
+import "./cron/emailCron.js";
+
 const app = express();
 
-const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true,
-};
+/* ---------------- SECURITY MIDDLEWARE ---------------- */
 
-// Middlewares
-app.use(cors(corsOptions));
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // needed for OAuth
+  }),
+);
+
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  next();
+});
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+});
+
+app.use(globalLimiter);
+/* ---------------- CORS ---------------- */
+
+const allowedOrigins = ["http://localhost:3000", "https://yourdomain.com"];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
+
+/* ---------------- PARSERS ---------------- */
+
 app.use(express.json());
 app.use(cookieParser());
+
+/* ---------------- ROUTES ---------------- */
 
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
-app.use("/api/auth", authRoutes);
+
+app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/auth", authLimiter, emailRoutes);
 app.use("/api/jobs", jobRoutes);
-app.use("/api/auth", emailRoutes);
 app.use("/api/ai", aiRoutes);
 
 export default app;

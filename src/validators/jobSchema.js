@@ -65,6 +65,22 @@ export const createJobSchema = z.object({
  * Allows controlled updates only
  */
 export const updateJobSchema = z.object({
+  company: z
+    .object({
+      name: z.string().min(1),
+      website: z.string().optional(),
+      location: z.string().optional(),
+      domain: z.string().optional(),
+    })
+    .optional(),
+
+  job: z
+    .object({
+      title: z.string().min(1),
+      link: z.string().optional(),
+      description: z.string().optional(),
+    })
+    .optional(),
   status: JobStatusEnum.optional(),
 
   notes: z.string().optional(),

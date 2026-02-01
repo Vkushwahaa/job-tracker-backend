@@ -46,6 +46,7 @@ export const registerUser = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+const isProd = process.env.NODE_ENV === "production";
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -69,8 +70,8 @@ export const loginUser = async (req, res) => {
   res
     .cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false, // true in prod
-      sameSite: "lax",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
@@ -145,7 +146,7 @@ export const getMe = async (req, res) => {
     }
 
     const user = await User.findById(req.user.userId).select(
-      "-password -refreshToken"
+      "-password -refreshToken",
     );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
