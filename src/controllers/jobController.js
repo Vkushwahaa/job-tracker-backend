@@ -247,7 +247,7 @@ export const updateJob = async (req, res) => {
     const job = await JobApplication.findOneAndUpdate(
       { _id: jobId, userId: req.user.userId },
       { $set: updatePayload },
-      { new: true }
+      { new: true },
     );
 
     if (!job) {

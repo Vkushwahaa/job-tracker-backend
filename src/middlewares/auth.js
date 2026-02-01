@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import jwt from "jsonwebtoken";
 
 // export const auth = (req, res, next) => {
@@ -24,6 +25,8 @@
 //   }
 // };
 
+=======
+>>>>>>> main
 import jwt from "jsonwebtoken";
 
 export const auth = (req, res, next) => {
@@ -33,6 +36,7 @@ export const auth = (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res
         .status(401)
+<<<<<<< HEAD
         .json({ message: "Missing or invalid auth header" });
     }
 
@@ -56,5 +60,18 @@ export const auth = (req, res, next) => {
   } catch (err) {
     console.error("AUTH ERROR:", err.message);
     return res.status(401).json({ message: "Invalid or expired token" });
+=======
+        .json({ messege: "either no token || invalid format" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = decoded;
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ messege: "invalid || token expired" });
+>>>>>>> main
   }
 };

@@ -14,10 +14,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+<<<<<<< HEAD
     refreshToken: {
       type: String,
       default: null,
     },
+=======
+>>>>>>> main
   },
   { timestamps: true }
 );

@@ -179,7 +179,7 @@ const jobApplicationSchema = new mongoose.Schema(
       index: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("JobApplication", jobApplicationSchema);
