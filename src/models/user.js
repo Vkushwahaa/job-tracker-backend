@@ -14,15 +14,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
-<<<<<<< HEAD
     refreshToken: {
       type: String,
       default: null,
     },
-=======
->>>>>>> main
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const User = mongoose.model("User", userSchema);
 export default User;

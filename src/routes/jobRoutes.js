@@ -6,7 +6,6 @@ import {
   getJobs,
   deleteJob,
   getSingleJob,
-<<<<<<< HEAD
   approveGmailJob,
 } from "../controllers/jobController.js";
 import { createJobSchema, updateJobSchema } from "../validators/jobSchema.js";
@@ -20,16 +19,5 @@ router.put("/:id", auth, validate(updateJobSchema), updateJob);
 router.delete("/:id", auth, deleteJob);
 router.get("/:id", auth, getSingleJob);
 router.post("/:id/approve-gmail", auth, approveGmailJob);
-=======
-} from "../controllers/jobController.js";
-
-const router = express.Router();
-
-router.post("/", auth, createJob);
-router.get("/", auth, getJobs);
-router.put("/:id", auth, updateJob);
-router.delete("/:id", auth, deleteJob);
-router.get("/:id", auth, getSingleJob);
->>>>>>> main
 
 export default router;
