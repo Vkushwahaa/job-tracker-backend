@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -43,8 +45,9 @@ const authLimiter = rateLimit({
 app.use(globalLimiter);
 /* ---------------- CORS ---------------- */
 
-const allowedOrigins = ["http://localhost:3000", "https://yourdomain.com"];
-
+const allowedOrigins = ["http://localhost:3000", process.env.CLIENT_URL].filter(
+  Boolean,
+);
 app.use(
   cors({
     origin: (origin, callback) => {
